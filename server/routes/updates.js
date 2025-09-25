@@ -14,18 +14,30 @@
 
 const state = require("../state");
 
+/**
+ * Artificial delay to simulate network/server delays that can affect onUpdateAvailable timing.
+ */
+const UPDATE_CHECK_DELAY_MS = 30 * 1000;
+
 module.exports = (req, res) => {
-  res.setHeader("Content-Type", "application/xml");
+  console.log(`[Update Check] Artificial delay: ${UPDATE_CHECK_DELAY_MS} ms`);
 
-  const { id, version } = state.getExtension();
+  // Add artificial delay to simulate real-world scenarios where there might be
+  // delays between Chrome's update check and when onUpdateAvailable fires
+  setTimeout(() => {
+    res.setHeader("Content-Type", "application/xml");
 
-  // prettier-ignore
-  res.send(`
+    const { id, version } = state.getExtension();
+
+    console.log(`[Update Check] Responding with version ${version} for extension ${id}`);
+
+    res.send(`
 <?xml version='1.0' encoding='UTF-8'?>
 <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
   <app appid='${id}'>
     <updatecheck codebase='http://${req.hostname}:${state.PORT}/extension.crx' version='${version}' />
   </app>
 </gupdate>
-  `.trim());
+    `.trim());
+  }, UPDATE_CHECK_DELAY_MS);
 };

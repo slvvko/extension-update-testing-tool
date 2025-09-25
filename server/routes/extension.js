@@ -14,7 +14,19 @@
 
 const path = require("path");
 
+/**
+ * Artificial delay to simulate network/server delays when downloading the extension
+ */
+const EXTENSION_DOWNLOAD_DELAY_MS = 40 * 1000;
+
 module.exports = (_, res) => {
-  res.setHeader("Content-Type", "application/x-chrome-extension");
-  res.sendFile(path.resolve("tmp/extension.crx"));
+  console.log(`[Extension Download] Artificial delay: ${EXTENSION_DOWNLOAD_DELAY_MS} ms`);
+
+  // Add artificial delay to simulate real-world scenarios where extension download
+  // takes time, which can affect when onUpdateAvailable fires
+  setTimeout(() => {
+    console.log("[Extension Download] Serving extension.crx");
+    res.setHeader("Content-Type", "application/x-chrome-extension");
+    res.sendFile(path.resolve("tmp/extension.crx"));
+  }, EXTENSION_DOWNLOAD_DELAY_MS);
 };
